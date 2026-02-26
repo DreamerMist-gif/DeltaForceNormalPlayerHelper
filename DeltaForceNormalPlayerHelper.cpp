@@ -2,7 +2,7 @@
 #include "SimpleThread.h"
 #include "SCManager.h"
 #include "MuteWindow.h"
-#include "tlhelp32.h"
+#include <tlhelp32.h>
 
 #pragma region 全局变量
 
