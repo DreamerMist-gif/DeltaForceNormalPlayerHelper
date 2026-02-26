@@ -22,7 +22,7 @@ jobs:
 
     # 2. 编译项目 (请将 下方的 ProjectName.sln 替换为你实际的解决方案文件名)
     - name: Build with MSBuild
-      run: msbuild /p:Configuration=Release /p:Platform=x86 ProjectName.sln 
+      run: msbuild /p:Configuration=Release /p:Platform=x86 DeltaForceNormalPlayerHelper.sln
       # 注意：根据你实际项目是 x86 还是 x64，修改上方的 Platform 参数
 
     # 3. 整理打包产物 (将编译出的 exe 和依赖的图片资源放在同一个文件夹)
