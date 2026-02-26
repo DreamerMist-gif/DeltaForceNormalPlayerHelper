@@ -1,19 +1,21 @@
 #include "SCManager.h"
 
 bool StopWindowsService(const wchar_t* serviceName) {
-    SC_HANDLE hSCManager = OpenSCManager(
+    // ä½¿ç”¨æ˜ç¡®çš„å®½å­—ç¬¦ç‰ˆæœ¬ OpenSCManagerW
+    SC_HANDLE hSCManager = OpenSCManagerW(
         NULL, NULL, SC_MANAGER_ALL_ACCESS);
 
     if (hSCManager == NULL) {
-        MessageBoxA(NULL, "´ò¿ª·şÎñ¹ÜÀíÆ÷Ê§°Ü", "´íÎó", MB_OK | MB_SYSTEMMODAL);
+        MessageBoxA(NULL, "æ‰“å¼€æœåŠ¡ç®¡ç†å™¨å¤±è´¥", "é”™è¯¯", MB_OK | MB_SYSTEMMODAL);
         return false;
     }
 
-    SC_HANDLE hService = OpenService(
+    // ä½¿ç”¨æ˜ç¡®çš„å®½å­—ç¬¦ç‰ˆæœ¬ OpenServiceW
+    SC_HANDLE hService = OpenServiceW(
         hSCManager, serviceName, SERVICE_STOP | SERVICE_QUERY_STATUS);
 
     if (hService == NULL) {
-        MessageBoxA(NULL, "´ò¿ª·şÎñÊ§°Ü", "´íÎó", MB_OK | MB_SYSTEMMODAL);
+        MessageBoxA(NULL, "æ‰“å¼€æœåŠ¡å¤±è´¥", "é”™è¯¯", MB_OK | MB_SYSTEMMODAL);
         CloseServiceHandle(hSCManager);
         return false;
     }
@@ -24,7 +26,7 @@ bool StopWindowsService(const wchar_t* serviceName) {
     if (!ControlService(
         hService, SERVICE_CONTROL_STOP, (LPSERVICE_STATUS)&ssStatus)) {
 
-        MessageBoxA(NULL, "·şÎñ¿ØÖÆÊ§°Ü", "´íÎó", MB_OK | MB_SYSTEMMODAL);
+        MessageBoxA(NULL, "æœåŠ¡æ§åˆ¶å¤±è´¥", "é”™è¯¯", MB_OK | MB_SYSTEMMODAL);
         CloseServiceHandle(hService);
         CloseServiceHandle(hSCManager);
         return false;
@@ -36,7 +38,7 @@ bool StopWindowsService(const wchar_t* serviceName) {
             hService, SC_STATUS_PROCESS_INFO,
             (LPBYTE)&ssStatus, sizeof(SERVICE_STATUS_PROCESS), &dwBytesNeeded)) {
 
-            std::cerr << "\n¸üĞÂ·şÎñ×´Ì¬Ê§°Ü£¬´íÎó´úÂë£º" << GetLastError() << std::endl;
+            std::cerr << "\næ›´æ–°æœåŠ¡çŠ¶æ€å¤±è´¥ï¼Œé”™è¯¯ä»£ç ï¼š" << GetLastError() << std::endl;
             break;
         }
 
