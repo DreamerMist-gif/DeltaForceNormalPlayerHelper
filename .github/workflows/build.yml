@@ -1,0 +1,47 @@
+name: Build Delta Force Helper
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    # 1. 如果代码库中没有包含 EasyX 的静态库，建议在这里添加一个下载或解压 EasyX 的步骤。
+    # 最稳妥的方法是将 easyx.h 和 EasyXw.lib/EasyXa.lib 直接放在仓库的依赖目录中，并通过相对路径引用。
+
+    # 2. 编译项目 (请将 下方的 ProjectName.sln 替换为你实际的解决方案文件名)
+    - name: Build with MSBuild
+      run: msbuild /p:Configuration=Release /p:Platform=x86 ProjectName.sln 
+      # 注意：根据你实际项目是 x86 还是 x64，修改上方的 Platform 参数
+
+    # 3. 整理打包产物 (将编译出的 exe 和依赖的图片资源放在同一个文件夹)
+    - name: Prepare Artifacts
+      run: |
+        mkdir ReleasePack
+        # 假设编译出的 exe 在 Release 目录下，根据实际情况修改路径
+        copy Release\*.exe ReleasePack\
+        
+        # 你的代码中引用了 L"PicRes\\..."，所以必须把图片资源目录原样复制过去
+        xcopy PicRes ReleasePack\PicRes\ /E /I /H /Y
+        
+        # 如果有默认配置文件或 License，也一并打包
+        copy LICENSE ReleasePack\ || echo "No LICENSE found"
+        copy README.md ReleasePack\ || echo "No README found"
+
+    # 4. 上传构建结果（在 GitHub 的 Actions 页面可以下载这个 zip 压缩包）
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DeltaForceNormalPlayerHelper-Release
+        path: ReleasePack/
