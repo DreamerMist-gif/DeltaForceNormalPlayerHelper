@@ -1,11 +1,11 @@
 #pragma once
 #pragma warning(disable:4996)
 
-#include "windows.h"
-#include "iostream"
-#include "graphics.h"
-#include "process.h"
-#include "string"
+#include <windows.h>
+#include <iostream>
+#include <process.h>
+#include <string>
+#include "graphics.h" // Keep quotes as this will be a local file in your repo
 
 void MBX(const char* str);
 void MBX(std::string str);
