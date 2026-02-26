@@ -14,42 +14,31 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 1. 替换 setup-msbuild：使用 ilammy/msvc-dev-cmd 配置 MSVC 编译环境，支持直接调用 cl.exe
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
       with:
-        arch: x86 # 配合你之前的 x86 平台设置
+        arch: x86
 
-    # 2. 纯 Actions 迁移核心：抛弃缺失的 .vcxproj，直接使用 cl.exe 命令行编译
-    # 提醒：请确保你已经按照原计划把 easyx.h 和 EasyXw.lib (或 EasyXa.lib) 放进了仓库根目录
     - name: Build with MSVC (cl.exe)
       run: |
         if (!(Test-Path Release)) { New-Item -ItemType Directory -Force -Path Release }
         
-        # 编译当前目录下的所有 .cpp 文件
-        # /EHsc: 启用标准的 C++ 异常处理
-        # /O2: 开启最高级代码优化
-        # /MD: 使用多线程 DLL 运行时库 (通常是 EasyX 推荐的配置)
-        # /Fe: 指定最终生成的 exe 路径
-        # 附加 Advapi32.lib Ole32.lib User32.lib Shell32.lib 等你的源码中涉及的 Windows API 库
-        cl.exe /EHsc /O2 /MD /Fe"Release\DeltaForceNormalPlayerHelper.exe" *.cpp Advapi32.lib Ole32.lib User32.lib Shell32.lib
+        # 将 EasyXa.lib (或你上传的 EasyXw.lib) 附加到链接库列表中
+        # 确保 graphics.h, easyx.h 和 EasyXa.lib 已经 Push 到了代码仓库的根目录
+        cl.exe /EHsc /O2 /MD /Fe"Release\DeltaForceNormalPlayerHelper.exe" *.cpp Advapi32.lib Ole32.lib User32.lib Shell32.lib EasyXa.lib
       shell: pwsh
 
-    # 3. 整理打包产物 (将编译出的 exe 和依赖的图片资源放在同一个文件夹)
     - name: Prepare Artifacts
       run: |
         New-Item -ItemType Directory -Force -Path ReleasePack
         Copy-Item Release\DeltaForceNormalPlayerHelper.exe ReleasePack\
         
-        # 你的代码中引用了 L"PicRes\\..."，所以必须把图片资源目录原样复制过去
         Copy-Item -Path PicRes -Destination ReleasePack\PicRes -Recurse -Force
         
-        # 如果有默认配置文件或 License，也一并打包
         if (Test-Path LICENSE) { Copy-Item LICENSE ReleasePack\ } else { Write-Host "No LICENSE found" }
         if (Test-Path README.md) { Copy-Item README.md ReleasePack\ } else { Write-Host "No README found" }
       shell: pwsh
 
-    # 4. 上传构建结果（在 GitHub 的 Actions 页面可以下载这个 zip 压缩包）
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
