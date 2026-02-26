@@ -1,4 +1,3 @@
-﻿
 #include "global.h"
 #include "SimpleThread.h"
 #include "SCManager.h"
@@ -784,7 +783,7 @@ unsigned int __stdcall UnlimitedFlash(void* args)
     {
         if (GetForegroundWindow() == g_hwnd)
         {
-            if ((GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0)
+            if ((GetAsyncKeyState(VK_OEM_3) & 0x8000) != 0)
             {
                 beg = clock();
                 now = clock();
