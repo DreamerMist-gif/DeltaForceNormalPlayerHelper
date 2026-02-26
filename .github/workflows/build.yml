@@ -18,6 +18,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x86
+        
 
     - name: Build with MSVC (cl.exe)
       run: |
